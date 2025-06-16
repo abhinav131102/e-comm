@@ -1,5 +1,5 @@
     DATABASE = {
-        users: []
+        users: [name, email, password]
     }
 
     SECRET_KEY = "super_secure_secret_key"

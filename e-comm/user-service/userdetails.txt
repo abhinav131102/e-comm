@@ -1,0 +1,33 @@
+    DATABASE = {
+        users: [name, email, password, uploadID]
+    }
+
+
+function handleRequest(request):
+        switch request.path:
+            case "/user/userId":    ==>  Method PUT
+                return UpdateProfile(request.body)
+            case "/user/userId": ==> Method GET
+                return GetProfile(request.body)
+            case "/user/userId": ==> Method Delete
+                return handleTokenValidation(request.headers["Authorization"])
+            default:
+                return 404 Not Found
+
+
+
+        function UpdateProfile(body):
+                name = body.name
+                uploadId = body.uploadId
+                id = body.id
+                email = body.email
+
+                if DATABASE.users.contains(id) :
+                    if no user find return 400
+
+               else update user
+
+                return 200 Created - "User details updated successfully"
+
+
+
