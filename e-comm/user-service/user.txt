@@ -1,0 +1,85 @@
+    DATABASE = {
+        users: []
+    }
+
+    SECRET_KEY = "super_secure_secret_key"
+    TOKEN_EXPIRY = 1 hour
+
+    // --- Main Entry Point ---
+    function handleRequest(request):
+        switch request.path:
+            case "/auth/register":
+                return handleRegister(request.body)
+            case "/auth/login":
+                return handleLogin(request.body)
+            case "/auth/validate":
+                return handleTokenValidation(request.headers["Authorization"])
+            default:
+                return 404 Not Found
+
+
+    // --- User Registration ---
+    function handleRegister(body):
+        email = body.email
+        password = body.password
+
+        if DATABASE.users.contains(email):
+            return 409 Conflict - "User already exists"
+
+        hashedPassword = hashPassword(password)
+        DATABASE.users.add({ email, password: hashedPassword })
+
+        return 201 Created - "User registered successfully"
+
+
+    // --- User Login ---
+    function handleLogin(body):
+        email = body.email
+        password = body.password
+
+        user = DATABASE.users.find(email)
+        if user is None:
+            return 404 Not Found - "User does not exist"
+
+        if not verifyPassword(password, user.password):
+            return 401 Unauthorized - "Invalid credentials"
+
+        token = generateJWT({ email: user.email }, SECRET_KEY, TOKEN_EXPIRY)
+
+        return 200 OK with { token: token }
+
+
+    // --- Token Validation ---
+    function handleTokenValidation(tokenHeader):
+        if tokenHeader is None:
+            return 401 Unauthorized - "No token provided"
+
+        token = extractBearerToken(tokenHeader)
+        payload = verifyJWT(token, SECRET_KEY)
+
+        if payload is None:
+            return 401 Unauthorized - "Invalid token"
+
+        return 200 OK - "Token is valid" with payload
+
+
+    // --- Utility Functions ---
+    function hashPassword(password):
+        return bcrypt.hash(password)
+
+    function verifyPassword(password, hashed):
+        return bcrypt.compare(password, hashed)
+
+    function generateJWT(payload, secret, expiry):
+        return JWT.encode(payload, secret, expiry)
+
+    function verifyJWT(token, secret):
+        try:
+            return JWT.decode(token, secret)
+        except:
+            return None
+
+    function extractBearerToken(header):
+        return header.split(" ")[1] if "Bearer " in header else None
+
+    //EOF

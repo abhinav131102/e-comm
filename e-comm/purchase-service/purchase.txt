@@ -1,0 +1,60 @@
+[Client] --(REST)--> [Cart Service]
+     --> Kafka("order-created")
+        --> [Purchase Service]
+             --> Kafka("payment-request")
+                 --> [Payment Worker]
+                     --> Payment Gateway
+                     <-- Kafka("payment-success" / "payment-failure")
+                         --> [Purchase Service]
+                             --> update order status in DB
+
+===============================================================================
+
+
+Kafka.subscribe("order-created", function(message):
+    saveOrderToDB(message)  // Status: PENDING_PAYMENT
+
+    paymentMessage = {
+        orderId: message.orderId,
+        userId: message.userId,
+        amount: message.total,
+        paymentMethod: message.paymentMethod
+    }
+
+    Kafka.publish("payment-request", paymentMessage)
+)
+
+
+Kafka.subscribe("payment-request", function(paymentMessage):
+    result = callPaymentGateway(paymentMessage)
+
+    if result.success:
+        Kafka.publish("payment-success", { orderId: paymentMessage.orderId })
+    else:
+        Kafka.publish("payment-failure", { orderId: paymentMessage.orderId, reason: result.error })
+)
+
+
+function callPaymentGateway(paymentMessage):
+    response = HTTP.post("https://fake-payment.com/pay", {
+        userId: paymentMessage.userId,
+        amount: paymentMessage.amount,
+        method: paymentMessage.paymentMethod
+    })
+
+    if response.status == 200 and response.body.status == "success":
+        return { success: true }
+    else:
+        return { success: false, error: response.body.message }
+
+
+Kafka.subscribe("payment-success", function(msg):
+    updateOrderStatus(msg.orderId, "PAID")
+    notifyUser(msg.orderId, "Order confirmed and paid")
+)
+
+
+Kafka.subscribe("payment-failure", function(msg):
+    updateOrderStatus(msg.orderId, "FAILED")
+    notifyUser(msg.orderId, "Payment failed: " + msg.reason)
+)

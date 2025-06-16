@@ -1,0 +1,81 @@
+CART_DB = {
+    // userId -> [ { productId, quantity, price } ]
+}
+
+function handleCartRequest(request):
+    userId = authenticateUser(request.headers["Authorization"])
+    if userId is None:
+        return response(401, "Unauthorized")
+
+    switch (request.method, request.path):
+        case ("GET", "/cart"):
+            return getCart(userId)
+
+        case ("POST", "/cart/items"):
+            return addItemToCart(userId, request.body)
+
+        case ("PUT", "/cart/items/{productId}"):
+            return updateItemQuantity(userId, request.params["productId"], request.body)
+
+        case ("DELETE", "/cart/items/{productId}"):
+            return removeItemFromCart(userId, request.params["productId"])
+
+        case ("DELETE", "/cart"):
+            return clearCart(userId)
+
+        case ("POST", "/cart/checkout"):
+            return checkoutCart(userId)
+
+        default:
+            return response(404, "Not Found")
+
+
+function getCart(userId):
+    cart = CART_DB.get(userId, [])
+    return response(200, { cart: cart })
+
+
+
+function addItemToCart(userId, body):
+    productId = body.productId
+    quantity = body.quantity
+    price = body.price  // Assume price is passed or fetched elsewhere
+
+    cart = CART_DB.get(userId, [])
+    existingItem = cart.find(item -> item.productId == productId)
+
+    if existingItem:
+        existingItem.quantity += quantity
+    else:
+        cart.append({ productId, quantity, price })
+
+    CART_DB[userId] = cart
+    return response(201, "Item added to cart")
+
+
+
+function removeItemFromCart(userId, productId):
+    cart = CART_DB.get(userId, [])
+    cart = cart.filter(item -> item.productId != productId)
+    CART_DB[userId] = cart
+    return response(200, "Item removed from cart")
+
+
+function checkoutCart(userId):
+    cart = CART_DB.get(userId, [])
+    if cart.isEmpty():
+        return response(400, "Cart is empty")
+
+    total = calculateTotal(cart)
+    orderPayload = {
+        orderId: generateUUID(),
+        userId: userId,
+        items: cart,
+        total: total,
+        paymentMethod: "credit_card"
+    }
+
+    Kafka.publish("order-created", orderPayload)
+
+    return response(200, { message: "Checkout started", orderId: orderPayload.orderId })
+
