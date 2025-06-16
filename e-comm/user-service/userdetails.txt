@@ -10,7 +10,7 @@ function handleRequest(request):
             case "/user/userId": ==> Method GET
                 return GetProfile(request.body)
             case "/user/userId": ==> Method Delete
-                return handleTokenValidation(request.headers["Authorization"])
+                return deleteProfile ==> Method Delete
             default:
                 return 404 Not Found
 
@@ -19,7 +19,7 @@ function handleRequest(request):
         function UpdateProfile(body):
                 name = body.name
                 uploadId = body.uploadId
-                id = body.id
+                id = param.get(id)
                 email = body.email
 
                 if DATABASE.users.contains(id) :
@@ -27,7 +27,28 @@ function handleRequest(request):
 
                else update user
 
-                return 200 Created - "User details updated successfully"
+                return 200 Updated - "User details updated successfully"
+
+
+        function GetProfile():
+
+                       id := param.get(id)
+
+                       userDetails := DATABASE.users.get(id)
+
+                        return 200, userDetails
+
+
+        func DeleteProfile():
+
+            id := param.get(id)
+
+            userDetails := DATABASE.users.delete(id)
+
+            return 200, "User details updated successfully"
+
+
+
 
 
 
