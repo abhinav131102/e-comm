@@ -12,7 +12,9 @@ DATABASE = {
                     return UpdateProduct(request.body)
                 case "/product: ==> Method GET
                     return GetProducts(request.body)
-                case "/product/ProductId": ==> Method Delete
+                case "/product/:ProductId":  ==> Method GET
+                    return GetProductDetail()
+                case "/product/:ProductId": ==> Method Delete
                     return DeleteProduct
                 default:
                     return 404 Not Found
@@ -41,6 +43,13 @@ DATABASE = {
     function GetProducts():
             products := DATABASE.Product.get()
             return 200, products
+
+
+    function GetProductDetail():
+           id = param.get(id)
+           productDetails = DATABASE.products.get(id)
+
+           return 200, productDetails
 
 
     func DeleteProduct():
