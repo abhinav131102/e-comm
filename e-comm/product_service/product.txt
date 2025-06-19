@@ -1,0 +1,53 @@
+DATABASE = {
+        products: [id, name, description, price]
+    }
+
+
+
+    function handleRequest(request):
+            switch request.path:
+               case "/product":  =>Method POST
+                   return CreateProduct
+                case "/product/ProductId":    ==>  Method PUT
+                    return UpdateProduct(request.body)
+                case "/product: ==> Method GET
+                    return GetProducts(request.body)
+                case "/product/ProductId": ==> Method Delete
+                    return DeleteProduct
+                default:
+                    return 404 Not Found
+
+
+    function CreateProduct(body):
+           Take Product details from admin and validation
+           DATABASE.Product.Insert(body)
+
+           return 200, product added successfully
+
+
+    function UpdateProduct(body):
+            name = body.Product
+            id = param.get(id)
+            description = body.description
+            Price = body.price
+            if  DATABASE.Product.createdBy != userId :
+              no product find return 400
+            else
+             update products
+
+             return 200 Updated - "Product details updated successfully"
+
+
+    function GetProducts():
+            products := DATABASE.Product.get()
+            return 200, products
+
+
+    func DeleteProduct():
+           id := param.get(id)
+           if check user has not created Product:
+               return error
+           else
+            DATABASE.products.delete(id)
+
+           return 200, "Product Deleted successfully"
