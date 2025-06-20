@@ -1,0 +1,61 @@
+DATABASE = {
+        address: [address, pin_code, mobile_no. user_id]
+    }
+
+
+    function handleRequest(request):
+                switch request.path:
+                   case "/address":  =>Method POST
+                       return AddAddress
+                    case "/address/:Id":    ==>  Method PUT
+                        return UpdateAddress(request.body)
+                    case "/address: ==> Method GET
+                        return GetAddress(request.body)
+                    case "/address/:Id":  ==> Method GET
+                        return GetAddressById()
+                    case "/address/:Id": ==> Method Delete
+                        return DeleteAddress
+                    default:
+                        return 404 Not Found
+
+
+        function AddAddress(body):
+               Take Address details from user and validation
+               DATABASE.Address.Insert(body)
+
+               return 200, Address added successfully
+
+
+        function UpdateAddress(body):
+                id = param.get(id)
+                address = body.address
+                pin_code = body.pin_code
+                if  DATABASE.address.createdBy != userId :
+                  no address find return 400
+                else
+                 update address
+
+                 return 200 Updated - "address details updated successfully"
+
+
+        function GetAddress():
+                userId := param.get(id)
+                address := DATABASE.address.get(userId)
+                return 200, address
+
+
+        function GetAddressById():
+               id = param.get(id)
+               addressDetail = DATABASE.products.get(id)
+
+               return 200, addressDetail
+
+
+        func DeleteAddress():
+               id := param.get(id)
+               if check user has not created address:
+                   return error
+               else
+                DATABASE.address.delete(id)
+
+               return 200, "address Deleted successfully"
