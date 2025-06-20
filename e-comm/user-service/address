@@ -46,7 +46,7 @@ DATABASE = {
 
         function GetAddressById():
                id = param.get(id)
-               addressDetail = DATABASE.products.get(id)
+               addressDetail = DATABASE.address.get(id)
 
                return 200, addressDetail
 
