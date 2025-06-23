@@ -1,0 +1,89 @@
+INVENTORY_DB = {
+    //  [ { productId, quantity , description  } ]
+}
+
+model inventory{
+    productName
+    quantity
+    price
+}
+
+function handleCartRequest(request):
+    userId = authenticateUser(request.headers["Authorization"])
+    if userId is None:
+        return response(401, "Unauthorized")
+
+    switch (request.method, request.path):
+        case ("GET", "/inventory"):
+            return getInventory(productId)
+
+        case ("POST", "/inventory/items"):
+            return addItemToInventory(request.body)
+
+        case ("PUT", "/inventory/items/{productId}"):
+            return updateItemQuantity(userId, request.params["productId"], request.body)
+
+        case ("DELETE", "/inventory/items/{productId}"):
+            return removeItemFromCart(userId, request.params["productId"])
+
+        case ("DELETE", "/inventory"):
+            return clearInventory(userId)
+
+        default:
+            return response(404, "Not Found")
+
+
+func getInventory(productId uuid ){
+        inventory = inventory.get(priductId, [])
+         return response(200, { inventory: inventory })
+}
+
+func addItemToInventory(inventory models.inventory){
+     productId = inventory.productId
+    quantity = inventory.quantity
+    
+    cart = CART_DB.get(userId, [])
+    existingItem = cart.find(item -> item.productId == productId)
+
+    if existingItem:
+        existingItem.quantity += quantity
+    else:
+        cart.append({ productId, quantity, price })
+
+    CART_DB[userId] = cart
+    return response(201, "Item added to cart")
+}
+
+
+function updateItemQuantity(productId, request){
+    newQuantity = data["quantity"]
+
+    if newQuantity is invalid or less than 0:
+        return response(400, "Invalid quantity")
+
+    cart = INVENTORY_DB[productId] 
+    item = find item in inventory where item.productId == productId
+
+    if item exists:
+        item.quantity = newQuantity
+        return response(200, "Quantity updated")
+    else:
+        return response(404, "Item not found in cart")
+}
+
+
+function removeItemFromInventory(productId){
+    productDetail = INVENTORY_DB[productId] 
+
+    if productDetail.id is invalid:
+        return response(400, "Invalid productId")
+ 
+    remove all productDetail for that particular productId
+
+    if productId is vaalid:
+           return response(200, "Item removed from cart")
+}
+  
+
+   
+
