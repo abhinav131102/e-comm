@@ -39,6 +39,7 @@ function getCart(userId):
 function addItemToCart(userId, body):
     productId = body.productId
     quantity = body.quantity
+
     price = body.price  // Assume price is passed or fetched elsewhere
 
     cart = CART_DB.get(userId, [])

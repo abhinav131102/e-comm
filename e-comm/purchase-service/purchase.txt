@@ -43,6 +43,8 @@ function callPaymentGateway(paymentMessage):
     })
 
     if response.status == 200 and response.body.status == "success":
+         call clearCart functionality.
+
         return { success: true }
     else:
         return { success: false, error: response.body.message }
