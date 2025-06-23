@@ -60,3 +60,12 @@ Kafka.subscribe("payment-failure", function(msg):
     updateOrderStatus(msg.orderId, "FAILED")
     notifyUser(msg.orderId, "Payment failed: " + msg.reason)
 )
+
+working on these feature 
+fucn updateOrderStatus(irderID , status string )error {
+
+}
+
+func notifyUser (){
+    
+}
