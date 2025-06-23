@@ -1,14 +1,4 @@
-[Client] --(REST)--> [Cart Service]
-     --> Kafka("order-created")
-        --> [Purchase Service]
-             --> Kafka("payment-request")
-                 --> [Payment Worker]
-                     --> Payment Gateway
-                     <-- Kafka("payment-success" / "payment-failure")
-                         --> [Purchase Service]
-                             --> update order status in DB
 
-===============================================================================
 
 
 Kafka.subscribe("order-created", function(message):
